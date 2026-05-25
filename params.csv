@@ -1,0 +1,12 @@
+key,type,encoding,value
+config,namespace,,utf-8
+wifi_ssid,data,string,default_ssid
+wifi_pass,data,string,default_pass
+ntp0,data,string,ptbtime1.ptb.de
+ntp1,data,string,time.google.com
+ntp2,data,string,time.aws.com
+tz,data,string,CET-1CEST,M3.5.0/2,M10.5.0/3
+br_min,data,string,5
+br_max,data,string,100
+br_gamma,data,string,2.20
+br_iir,data,string,5

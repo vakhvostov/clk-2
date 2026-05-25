@@ -1,0 +1,10 @@
+.claude/
+components/
+build/
+.devcontainer/
+.vscode/
+*.old
+*.gdb
+*.log
+workspace.code-workspace
+.editorconfig
