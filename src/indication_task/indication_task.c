@@ -225,13 +225,13 @@ static uint8_t encode_even(uint8_t s)  /* digits 2, 4, 6 */
 
 static void build_frame(uint8_t buf[8], int h, int m, int s, int ms100, uint8_t color)
 {
-    buf[0] = encode_odd (seg7[h   / 10]); /* D1 hours tens    */
-    buf[1] = encode_even(seg7[h   % 10]); /* D2 hours ones    */
-    buf[2] = encode_odd (seg7[m   / 10]); /* D3 minutes tens  */
-    buf[3] = encode_even(seg7[m   % 10]); /* D4 minutes ones  */
-    buf[4] = encode_odd (seg7[s   / 10]); /* D5 seconds tens  */
-    buf[5] = encode_even(seg7[s   % 10]); /* D6 seconds ones  */
-    buf[6] = encode_odd (seg7[ms100]);    /* D7 ms hundreds   */
+    buf[0] = encode_odd (seg7[h   / 10]);         /* D1 hours tens        */
+    buf[1] = encode_even(seg7[h   % 10] | 0x80); /* D2 hours ones   + DP */
+    buf[2] = encode_odd (seg7[m   / 10]);         /* D3 minutes tens      */
+    buf[3] = encode_even(seg7[m   % 10] | 0x80); /* D4 minutes ones + DP */
+    buf[4] = encode_odd (seg7[s   / 10]);         /* D5 seconds tens      */
+    buf[5] = encode_even(seg7[s   % 10] | 0x80); /* D6 seconds ones + DP */
+    buf[6] = encode_odd (seg7[ms100]);            /* D7 ms hundreds       */
     buf[7] = color;
 }
 
