@@ -36,6 +36,7 @@ void gpio_bsp_init(void)
     gpio_config(&io_conf);
     gpio_set_level(LED_PIN, 1);
     gpio_set_level(IPHEN_PIN, 1);
+    gpio_set_level(PWEN_PIN, 1);
 }
 
 
