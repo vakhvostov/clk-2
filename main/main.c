@@ -31,12 +31,12 @@ void gpio_bsp_init(void)
 
     io_conf.intr_type    = GPIO_INTR_DISABLE;
     io_conf.mode         = GPIO_MODE_OUTPUT;
-    io_conf.pin_bit_mask = ( (1ULL << PWEN_PIN)  | (1ULL << LED_PIN) | (1ULL << IPHEN_PIN));
+    io_conf.pin_bit_mask = ( (1ULL << LED_PIN) | (1ULL << OE_EN_PIN) );
     io_conf.pull_up_en   = 0;
     gpio_config(&io_conf);
     gpio_set_level(LED_PIN, 1);
-    gpio_set_level(IPHEN_PIN, 1);
-    gpio_set_level(PWEN_PIN, 1);
+    gpio_set_level(OE_EN_PIN, 0);
+
 }
 
 
@@ -46,7 +46,7 @@ void app_main(void)
     gpio_bsp_init();
     nvs_fx_init();
     spi0_init();
-    indication_init(spi0_tx);
+    indication_init(spi0_tx, indication_set_led);
        
     ntp_task_init();
     cli_task_init();
@@ -54,10 +54,11 @@ void app_main(void)
     
     
 
-
     for(;;)
     {
         LOGI("Hearbeat\r\n");
+        indication_set_synchronized(ntp_get_sync_status());
+
         vTaskDelay(500);
         
     }

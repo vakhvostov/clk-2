@@ -23,5 +23,6 @@ void ntp_reload_config();
 time_t ntp_get_lastsync(void);
 const char* ntp_get_ssid(void);
 const char* ntp_get_servers(int);
+bool ntp_get_sync_status(void);
 
 #endif

@@ -51,6 +51,13 @@ static bool istimetorenew()
     return tv.tv_sec - nstruct.lasttv.tv_sec > RENEW_PERIOD_SEC;
 }
 
+static bool needs_sync()
+{
+    return nstruct.never_synchronised
+           || nstruct.force_resync
+           || istimetorenew();
+}
+
 void ntp_set_suspend(bool suspend)
 {
     nstruct.suspend = suspend;
@@ -210,11 +217,7 @@ static void task(void *p)
             continue;
         }
 
-        bool needs_sync = nstruct.never_synchronised
-                       || nstruct.force_resync
-                       || istimetorenew();
-
-        if (needs_sync) {
+        if (needs_sync()) {
             LOGI("Attempting NTP sync");
             nstruct.last_sync_success = 0;
 
@@ -248,4 +251,9 @@ int ntp_task_init()
     if (xTaskCreate(task, "NTP", configMINIMAL_STACK_SIZE + 8192, NULL, NTP_TASK_PRIORITY, NULL))
         return 0;
     return -2;
+}
+
+bool ntp_get_sync_status(void)
+{
+    return !needs_sync();
 }

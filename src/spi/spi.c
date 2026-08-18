@@ -26,7 +26,7 @@ static spi_bus_config_t spi0_buscfg =
 
 static spi_device_interface_config_t spi0_devcfg =
 {
-    .clock_speed_hz = 8 * 1000 * 1000, // Clock
+    .clock_speed_hz = 1 * 1000 * 1000, // Clock
     .mode = 0,                          // SPI mode 0
     .spics_io_num = SPI0_CS_PIN,        // CS pin control disabled
     .queue_size = 7,                    // We want to be able to queue 7 transactions at a time

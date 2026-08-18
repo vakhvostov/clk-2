@@ -16,7 +16,7 @@
 #include "time.h"
 #include "ntp_task.h"
 #include "nvs_fx.h"
-#include "indication_task.h"
+
 
 #define LOGI(...) ESP_LOGI("#", __VA_ARGS__)
 const char *prompt = "clk>";
@@ -117,12 +117,6 @@ static int cli_cmd_stat(int argc, char **argv)
         printf("  %s\n", ntp_get_servers(i));
 
     printf("SSID: %s\n", ntp_get_ssid());
-
-    const brightness_cfg_t *bcfg = indication_get_brightness_cfg();
-    printf("Brightness: %d%%  (min=%d%% max=%d%% gamma=%.2f iir_shift=%d tau~%dms)\n",
-           indication_get_brightness_pct(),
-           bcfg->min_pct, bcfg->max_pct, bcfg->gamma,
-           bcfg->iir_shift, (1 << bcfg->iir_shift) * 10);
     return 0;
 }
 
@@ -167,48 +161,7 @@ static int cli_cmd_resync(int argc, char **argv)
     return 0;
 }
 
-/* bright <min%> <max%> <gamma> <iir_shift>
- * Example: bright 5 100 2.2 5 */
-static int cli_cmd_bright(int argc, char **argv)
-{
-    if (argc != 5) {
-        printf("Usage: bright <min%%> <max%%> <gamma> <iir_shift>\n"
-               "  min%%      minimum brightness (1-100)\n"
-               "  max%%      maximum brightness (1-100)\n"
-               "  gamma     perceptual curve exponent (e.g. 2.2)\n"
-               "  iir_shift IIR smoothing factor 1-8 (tau = 2^n * 10ms)\n");
-        return -1;
-    }
 
-    int   min_pct   = atoi(argv[1]);
-    int   max_pct   = atoi(argv[2]);
-    float gamma     = strtof(argv[3], NULL);
-    int   iir_shift = atoi(argv[4]);
-
-    if (min_pct < 1 || min_pct > 100 || max_pct < 1 || max_pct > 100 || min_pct >= max_pct) {
-        printf("Invalid range: min must be < max, both in 1-100.\n");
-        return -1;
-    }
-    if (gamma < 0.1f || gamma > 10.0f) {
-        printf("Invalid gamma: expected 0.1-10.0.\n");
-        return -1;
-    }
-    if (iir_shift < 1 || iir_shift > 8) {
-        printf("Invalid iir_shift: expected 1-8.\n");
-        return -1;
-    }
-
-    brightness_cfg_t cfg = {
-        .min_pct   = (uint8_t)min_pct,
-        .max_pct   = (uint8_t)max_pct,
-        .gamma     = gamma,
-        .iir_shift = (uint8_t)iir_shift,
-    };
-    indication_set_brightness_config(&cfg);
-    printf("Brightness updated: min=%d%% max=%d%% gamma=%.2f iir_shift=%d (tau~%dms)\n",
-           min_pct, max_pct, gamma, iir_shift, (1 << iir_shift) * 10);
-    return 0;
-}
 
 /* --------------------------------------------------------------------------
  * Task
@@ -248,20 +201,12 @@ void cli_task(void *arg)
         .argtable = NULL,
     };
 
-    const esp_console_cmd_t bright_def = {
-        .command  = "bright",
-        .hint     = "<min%> <max%> <gamma> <iir_shift>",
-        .help     = "Set brightness range, gamma curve and IIR smoothing (e.g. bright 5 100 2.2 5)",
-        .func     = cli_cmd_bright,
-        .argtable = NULL,
-    };
+
 
     esp_console_cmd_register(&stat_def);
     esp_console_cmd_register(&set_def);
     esp_console_cmd_register(&log_def);
     esp_console_cmd_register(&resync_def);
-    esp_console_cmd_register(&bright_def);
-
     esp_console_register_help_command();
     LOGI("CLI init complete");
 
